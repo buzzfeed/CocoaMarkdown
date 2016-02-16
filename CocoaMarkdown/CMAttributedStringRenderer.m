@@ -17,7 +17,7 @@
 #import "CMNode.h"
 #import "CMParser.h"
 
-#import "Ono.h"
+#import <Ono/Ono.h>
 
 @interface CMAttributedStringRenderer () <CMParserDelegate>
 @end

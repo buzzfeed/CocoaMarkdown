@@ -7,7 +7,7 @@
 //
 
 #import "CMHTMLStrikethroughTransformer.h"
-#import "Ono.h"
+#import <Ono/Ono.h>
 
 @implementation CMHTMLStrikethroughTransformer {
     CMUnderlineStyle _style;

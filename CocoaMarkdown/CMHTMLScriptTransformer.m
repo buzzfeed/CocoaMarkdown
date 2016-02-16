@@ -10,7 +10,7 @@
 #import "CMHTMLScriptTransformer_Private.h"
 #import "CMPlatformDefines.h"
 
-#import "Ono.h"
+#import <Ono/Ono.h>
 
 #if TARGET_OS_IPHONE
 #import <CoreText/CTStringAttributes.h>
