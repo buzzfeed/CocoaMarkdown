@@ -30,6 +30,7 @@
     NSMutableDictionary *_tagNameToTransformerMapping;
     NSMutableAttributedString *_buffer;
     NSAttributedString *_attributedString;
+    BOOL _didJustStartListItem;
 }
 
 - (instancetype)initWithDocument:(CMDocument *)document attributes:(CMTextAttributes *)attributes
@@ -38,6 +39,7 @@
         _document = document;
         _attributes = attributes;
         _tagNameToTransformerMapping = [[NSMutableDictionary alloc] init];
+        _didJustStartListItem = NO;
     }
     return self;
 }
@@ -102,7 +104,13 @@
 
 - (void)parserDidStartParagraph:(CMParser *)parser
 {
-    [self appendLineBreakIfNotTightForNode:parser.currentNode];
+    // SC: Workaround a bug that would occasionally add extra line breaks immediately after a bullet
+    // in a list. We never want to start a list and immediately line break.
+    if (!_didJustStartListItem) {
+        [self appendLineBreakIfNotTightForNode:parser.currentNode];
+    } else {
+        _didJustStartListItem = NO;
+    }
 }
 
 - (void)parserDidEndParagraph:(CMParser *)parser
@@ -201,7 +209,9 @@
 
 - (void)parserFoundSoftBreak:(CMParser *)parser
 {
-    [self appendString:@"\n"];
+    // SC: Note that I pulled this from b3b8e36237ed3eef351673b628ee41329eb89961 which appears to be
+    // the correct thing to do.
+    [self appendString:@" "];
 }
 
 - (void)parserFoundLineBreak:(CMParser *)parser
@@ -263,12 +273,15 @@
         default:
             break;
     }
+
+    _didJustStartListItem = YES;
 }
 
 - (void)parserDidEndListItem:(CMParser *)parser
 {
     [self appendString:@"\n"];
     [_attributeStack pop];
+    _didJustStartListItem = NO;
 }
 
 #pragma mark - Private
@@ -295,6 +308,14 @@
 
 - (void)appendString:(NSString *)string
 {
+    // SC: In some scenarios, CocoaMarkdown adds too many line breaks. Let's fix this hackily.
+    // There may be a better way to do this but it's complicated and probably requires adding a
+    // bunch of state or looking back / ahead at the nodes around the current one. This is simple
+    // and I can't think of a scenario where we really want more than 3 line breaks in a row.
+    if ([string isEqualToString:@"\n"] && [[_buffer string] hasSuffix:@"\n\n"]) {
+        return;
+    }
+
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string attributes:_attributeStack.cascadedAttributes];
     [_buffer appendAttributedString:attrString];
 }
