@@ -93,7 +93,9 @@
 
 - (void)parser:(CMParser *)parser didStartHeaderWithLevel:(NSInteger)level
 {
-    [self appendLineBreakIfNotTightForNode:parser.currentNode];
+    if ([[_buffer string] length] > 0) {
+        [self appendString:@"\n"];
+    }
     [_attributeStack push:CMDefaultAttributeRun([_attributes attributesForHeaderLevel:level])];
 }
 
