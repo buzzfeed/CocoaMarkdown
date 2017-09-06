@@ -93,6 +93,7 @@
 
 - (void)parser:(CMParser *)parser didStartHeaderWithLevel:(NSInteger)level
 {
+    [self appendLineBreakIfNotTightForNode:parser.currentNode];
     [_attributeStack push:CMDefaultAttributeRun([_attributes attributesForHeaderLevel:level])];
 }
 
@@ -300,6 +301,11 @@
 
 - (void)appendLineBreakIfNotTightForNode:(CMNode *)node
 {
+    // SC: Don't append a line break if we have no string, yet.
+    if ([[_buffer string] length] == 0) {
+        return;
+    }
+
     CMNode *grandparent = node.parent.parent;
     if (!grandparent.listTight) {
         [self appendString:@"\n"];
