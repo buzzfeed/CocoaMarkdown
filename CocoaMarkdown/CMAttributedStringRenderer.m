@@ -93,9 +93,12 @@
 
 - (void)parser:(CMParser *)parser didStartHeaderWithLevel:(NSInteger)level
 {
+    // SC: Fix an issue where headers did not have any space before them and were aligned with the
+    // previous text. This didn't look good.
     if ([[_buffer string] length] > 0) {
         [self appendString:@"\n"];
     }
+
     [_attributeStack push:CMDefaultAttributeRun([_attributes attributesForHeaderLevel:level])];
 }
 
