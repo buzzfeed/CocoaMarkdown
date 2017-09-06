@@ -93,6 +93,12 @@
 
 - (void)parser:(CMParser *)parser didStartHeaderWithLevel:(NSInteger)level
 {
+    // SC: Fix an issue where headers did not have any space before them and were aligned with the
+    // previous text. This didn't look good.
+    if ([[_buffer string] length] > 0) {
+        [self appendString:@"\n"];
+    }
+
     [_attributeStack push:CMDefaultAttributeRun([_attributes attributesForHeaderLevel:level])];
 }
 
@@ -300,6 +306,11 @@
 
 - (void)appendLineBreakIfNotTightForNode:(CMNode *)node
 {
+    // SC: Don't append a line break if we have no string, yet.
+    if ([[_buffer string] length] == 0) {
+        return;
+    }
+
     CMNode *grandparent = node.parent.parent;
     if (!grandparent.listTight) {
         [self appendString:@"\n"];
