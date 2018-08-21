@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  
+
   s.name          = 'CocoaMarkdown'
   s.version       = '1.0'
   s.summary       = 'Markdown parsing and rendering for iOS and OS X'
@@ -11,11 +11,14 @@ Efficient NSAttributedString creation for easy rendering on iOS and OS X. Most e
   s.license       = 'MIT'
 
   s.author        = "Indragie Karunaratne"
-  s.platform      = :ios, '8.0'
+  s.ios.deployment_target = '8.0'
+  s.osx.deployment_target = '10.10'
 
-  s.source        = { :git => 'https://github.com/indragiek/CocoaMarkdown.git' }
+  s.source        = { :git => 'https://github.com/buzzfeed/CocoaMarkdown.git' }
   s.source_files  = 'CocoaMarkdown'
-  s.framework     = 'UIKit'
+  s.private_header_files = 'CocoaMarkdown/*_Private.h'
+  s.ios.framework = 'UIKit'
+  s.osx.framework = 'Cocoa'
   s.requires_arc  = true
 
   s.dependency 'cmark', '~> 0.21.0'
